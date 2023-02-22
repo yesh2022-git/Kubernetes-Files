@@ -1,0 +1,654 @@
+ Docker--- Linux 
+  DockerName : DockerVM
+  Uservm : ubuntu 
+  Pass   : Chethan@00789
+  ssh -i - ubuntu@20.235.11.15
+  ssh -i - ubuntu@20.219.127.139
+  ssh -i - ubuntu@20.219.120.140  ---- DOCKER-MAIN
+  ssh -i - ubuntu@20.219.105.73   ----- DOCKER-WORKER 
+
+  ssh -i - ubuntu@20.219.102.117  --- VM-Manager
+  ssh -i - ubuntu@20.219.98.33  ---- Worker-1
+  ssh -i - ubuntu@20.219.98.65  ---- Worker-2
+  
+  sudo su -
+  ls
+  curl -fsSL https://get.docker.com -o get-docker.sh
+  ls
+  sh get-docker.sh
+  docker --version
+  docker pull tomee            tomcat = Application Server 
+  docker pull tomacat          Nginix = Web Server  
+  docker pull ubuntu 
+  docker image ls
+  docker run --name <contrainer_Name> -p <port_number>:<image_port_number> <image_name>
+  docker run --name com77 -p 7070:8080 tomcat
+  docker container ls
+  http://<VM_Public_IP_Address>:7070/
+  http://20.219.166.12:7070/  --- To Access The Application 
+  
+
+  docker run --name <container_name> -P -d nginx  --- Automatic assign port number and runs the container 
+  docker run --name Ycon1 -P -d nginx
+  docker image ls
+  docker container ls
+  docker port <container_name>
+  docker port Ycon1
+  <public_IP>:<dockerhostport>
+  20.219.159.189:32768
+  docker run --name <container_name> -it centos
+  docker run --name Ycon2 -it centos  --- OS Container 
+  Exit 
+  docker image ls
+  docker container ls
+  docker rm <container name>
+  docker start <container_name> = docker start Ycon2
+  docker attach <container_name> = docker attach Ycon2 ---- Enters the container
+  docker run --name <database_name> -d -e MYSQL_ROOT_PASSWORD=<database_password> mysql:8 
+  docker run --name YDB -d -e MYSQL_ROOT_PASSWORD=Yash mysql:8  --- Database deploy
+  docker exec -it <database_name> bash
+  docker exec -it YDB bash  --- Opens mysql database terminal
+  mysql -u root -p  ---- It connects with the mysql database & give password 
+  show databases;
+  use mysql;
+
+Mysql Query 
+
+-- Create a database
+-- DROP DATABASE IF EXISTS quickstartdb;
+CREATE DATABASE quickstartdb;
+USE quickstartdb;
+
+-- Create a table and insert rows
+DROP TABLE IF EXISTS inventory;
+CREATE TABLE inventory (id serial PRIMARY KEY, name VARCHAR(50), quantity INTEGER);
+INSERT INTO inventory (name, quantity) VALUES ('banana', 150);
+INSERT INTO inventory (name, quantity) VALUES ('orange', 154);
+INSERT INTO inventory (name, quantity) VALUES ('apple', 100);
+
+-- Read
+SELECT * FROM inventory;
+
+-- Update
+UPDATE inventory SET quantity = 200 WHERE id = 1;
+SELECT * FROM inventory;
+
+-- Delete
+DELETE FROM inventory WHERE id = 2;
+SELECT * FROM inventory;
+read escape sequence 
+
+Multi-Container Linking 
+
+docker run --name <Container_name> -it busybox
+docker run --name Ybb -it busybox  --- Busy box = Linux OS
+Ctrl + p + q  --- To comeout of the container without exting it i.e, containers runs in background 
+docker container ls
+docker run --name <Container_name> --link <first_container_name>:<link_name>-alias -it busybox
+docker run --name Ybb2 --link Ybb:Yb-alias -it busybox --- Creats new busy box Ybb2 container and links with the Ybb container
+ping Ybb --- To check wheather Ybb2 is connected with the Ybb
+docker rm -f <container_name>  = docker rm -f Ybb  -- Removes specific container 
+docker rm -f $(docker ps -aq) --- Removes all the containers
+docker rmi <your-image-id>  = docker rmi 66ba00ad3de8 -- Removes specific image
+docker rmi $(docker images -q)  --- Removes all the images 
+exit ----- we will comeout of the container by stopping the container 
+ctrl+p+q --- we will comeout of the container, by running it in the background 
+
+--------------
+
+docker run --name <database_name> -d -e MYSQL_ROOT_PASSWORD=<database_password> mysql:8
+docker run --name MyDB -d -e MYSQL_ROOT_PASSWORD=Yash mysql:8
+docker run --name <Container-name> -d -p 4545:80 --link <First-Container-name>:<Link-name> wordpress
+docker run --name mywordsite -d -p 4545:80 --link MyDB:yashlink wordpress
+docker inspect mywordsite
+20.219.10.170:4545
+docker exec -it MyDB bash
+mysql -u root -p
+GIVE PASS : Yash
+
+--------------
+
+LAMP
+
+docker run --name <database_name> -d -e MYSQL_ROOT_PASSWORD=<database_password> mysql:8
+docker run --name mydb -d -e MYSQL_ROOT_PASSWORD=Yash mysql:8
+docker run --name <container-name> -d -p 5050:8080 --link <First-Container-Name>:<Link-Name> tome
+docker run --name mycon -d -p 5050:8080 --link mydb:ylink tomee
+<Public-ip>:<Port-Number>
+ 20.219.119.34:5050
+docker inspect <Tomcat-Container-Name>
+docker inspect mycon
+docker run --name <Container-name> -d --link <Second-container-name>:<link-name> --link <firstcontainer-name>:<link-name> php
+docker run --name php -d --link mycon:tomee --link mydb:dbl php
+
+docker run --name hub -d -p 4444:4444 selenium/hub
+docker run --name chrome -d -p 5901:5900 --link hub:selenium selenium/node-chrome-debug
+20.219.119.34:5901
+
+docker compose----
+
+sudo curl -L "https://github.com/docker/compose/releases/download/1.24.0/docker-compose-$(uname -s)-$(uname -m)" -o/usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+docker-compose --version
+docker --version
+vim docker-compose.yml  --- Paste the yaml code in it
+docker-compose up -d   ---- To run the yaml
+20.219.119.96:5050 -- example-1
+20.219.119.96:6060 -- example-2
+20.219.119.96:5901 -- example-3
+
+Docker Volume----
+
+mkdir /data
+docker run --name <container-name> -it -v /data centos
+docker run --name con1 -it -v /data centos
+docker inspect <Container-name>
+docker inspect con1  -- copy the source -- "/var/lib/docker/volumes/bc038b253dc57bba16c8f79b53e1a5bbb204516e36be38014dcc577f2278270b/_data",
+
+
+Shareble Volumes------
+
+mkdir /data
+docker run --name <container-name> -it -v /data centos
+docker run --name con1 -it -v /data centos  
+cd data
+touch file1 file2
+docker inspect con1
+"/var/lib/docker/volumes/ba50081fd60a02abaf05d418a0c1c83ae67e17982b625e0fe3f06765b40be39a/_data",  ---- Path
+docker run --name c2 -it --volumes-from con1 centos
+ ls
+cd data  --- shows files 1,2 which present in con1 due to we are sharing the volumes with the c2
+docker run --name con3 -it --volumes-from c2 centos
+cd data
+ls
+touch file5 file6
+Ctrl + p +q
+docker inspect con1
+docker rm -f $(docker ps -aq)   --- remove all containers
+cd /var/lib/docker/volumes/ba50081fd60a02abaf05d418a0c1c83ae67e17982b625e0fe3f06765b40be39a/_data   ---- shows files of deleted containers
+
+Custom Images----
+
+docker run --name c11 -it ubuntu
+apt-get update
+apt-get install git
+git --version
+exit
+docker commit c11 myubunutu
+docker commit c11 yashubunutu
+docker run --name c22 -it myubunutu
+docker run --name c22 -it yashubunutu
+
+Docker File-----
+
+• FROM: Used to specify the base image from which the docker file has to be created.
+• MAINTAINER: This represents name of the organization or the author who created this docker file.
+• CMD: This is used to specify the initial command that should be executed when the container starts.
+• ENTRYPOINT - used to specify the default process that should be executed when container starts. It can also be used for accepting arguments from the CMD instruction
+• RUN: Used for running Linux commands within the container. It is generally helpful for installing the software in the container.
+• USER: Used to specify the default user who should login into the container.
+• WORKDIR: Used to specify default working directory in the container
+• COPY: Copying the files from the host machine to the container.
+• ADD: Used for copying files from host to container, it can also be used for downloading files from remote servers.
+• ENV: used for specifying the environment variables 
+• EXPOSE: Used to specify the internal port of the container.
+• VOLUME: Used to specify the default volume that should be attached to the container.
+• LABEL: Used for giving label to the container.
+• STOPSIGNAL: Used to specify the key sequences that have to be passed in order to stop the container.that should be passed to the container
+
+
+vim dockerfile
+FROM nginx
+MAINTAINER yash
+:wq!
+docker build -t mynginx .
+
+vim dockerfile
+FROM centos
+MAINTAINER yash
+CMD ["date"]
+
+docker build -t mycentos .
+docker images
+docker run -it mycentos
+
+vi dockerfile
+FROM centos
+MAINTAINER yash
+CMD ["date"]
+CMD ["ls","-la"]
+:wq!
+
+docker build -t mycentos .
+docker run -it mycentos
+
+vim dockerfile
+FROM ubuntu
+MAINTAINER yash
+RUN apt-get update
+RUN apt-get install -y git
+:wq!
+docker build -t myubuntu .
+docker images
+docker run -it myubuntu
+git --version
+
+
+Docker File - Version Controlling------- 16:42
+
+mkdir docker
+ls
+cd docker
+vim dockerfile
+FROM ubuntu
+MAINTAINER yash
+RUN apt-get update
+RUN apt-get install -y git
+:wq!
+
+git init
+ls -a
+git status
+git add .
+git config --global user.name "yesh2022-git"
+git config --global user.email pm.yeswanth1995@gmail.com
+git commit -m "1"
+
+vim dockerfile
+RUN apt-get install -y default jdk --- add into the previous file 
+git status
+git add .
+git commit -m "2"
+git log --oneline
+
+Cache Busting-------
+
+vim dockerfile
+FROM ubuntu
+MAINTAINER ankitnarula
+RUN apt-get update
+RUN apt-get install -y git
+esc
+:wq!
+docker build -t myubuntu .
+vim dockerfile
+RUN apt-get install -y tree  --- Add into the docker file 
+docker build -t myubuntu .      ---- only runs the newly addes command
+
+FROM ubuntu
+MAINTAINER ankitnarula
+RUN apt-get update && RUN apt-get install -y git && RUN apt-get install -y tree
+docker build -t myubuntu .    ---- Now it runs all the commands newly
+
+
+Docker Registry-----------
+
+docker run --name u1 -it ubuntu
+apt-get update
+apt-get install tree
+docker commit <Container-name> ankitnarula1991/<image-name>
+docker commit u1 yashpm/myubuntu
+docker login --- user
+                 pass
+docker push <image-name>
+docker push myubuntu
+
+Container Orchestration------------------
+
+Create three vm -- vm-manager
+                   worker-1
+                   worker-2
+And install docker in all vms
+docker swarm init --advertise-addr <private_ip_of_manager>
+docker swarm init --advertise-addr 10.0.0.5 --- install docker swarm in vm-manager 
+ docker swarm join --token SWMTKN-1-5z9afurvhn54sjp3i6fg5yuwr50q83zc6r19fsimfx6glh5c2s-f4zlfnudwd69o791cb99mtnfw 10.0.0.5:2377
+Copy this token in both worker 1 & 2, it makes the worker nodes to connects with the vm-manager
+docker node ls  --- in vm-manager ---shows all connected vms
+docker service create --name webserver -p 9090:8080 --replicas 5 tomee  --- in vm-manager
+docker service ps webserver  --- shows on which vm which container is running 
+<Public-IP-manager-machine>:9090
+20.219.102.117:9090
+20.219.98.33:9090
+20.219.98.65:9090
+
+Handling Failover Scenarios--------
+
+docker container ls
+docker service ps webserver
+docker rm -f <container-id>
+docker rm -f 80951c892b7f
+
+Scaling of Containers-------
+docker service scale webserver=10
+docker service ps webserver
+docker service scale webserver=5
+
+Remove a Node-----
+
+Manager Can drain
+docker node update --availability drain worker-1
+docker node ls
+docker service ps webserver
+docker node update --availability active worker-1
+
+Node can Leave---
+Connect to worker 2 Machine
+docker swarm leave  ---- Node is left 
+docker node ls
+docker swarm join --token SWMTKN-1-5z9afurvhn54sjp3i6fg5yuwr50q83zc6r19fsimfx6glh5c2s-f4zlfnudwd69o791cb99mtnfw 10.0.0.5:2377
+Copy this token in both worker 1 & 2, it makes the worker nodes to connects with the vm-manager                                ------- To add it again
+
+Rolling Updates-----------------------
+
+docker swarm init --advertise-addr<private_ip_of_manager>
+docker swarm init --advertise-addr 20.219.120.140
+docker swarm join --token SWMTKN-1-633ldum7a9dmxsa3yt67d8ywc6391w6yjmnmv736dsbg0afvw2-4pmly2jdpha3w58l6g5v76b6z 20.219.120.140:237---- Gives this token
+docker service create --name myredis --replicas 6 redis:3  -- DOCKERVM-MAIN
+docker container ls
+docker node ls
+docker service ps myredis
+docker service update --image redis:4 myredis
+docker service ps myredis | grep Shutdown --- Shows only shutdow pods
+docker service ps myredis | grep -v Shutdown  --- Shows only running pods
+docker service update --rollback myredis  ---- Bring back previous version of the pods
+docker service ps myredis  ---- To check the replicas
+docker swarm join-token worker
+docker swarm join --token SWMTKN-1-633ldum7a9dmxsa3yt67d8ywc6391w6yjmnmv736dsbg0afvw2-4pmly2jdpha3w58l6g5v76b6z 20.219.120.140:2377
+docker swarm join-token manager  --- To add a new machine as a manager
+docker swarm join --token SWMTKN-1-633ldum7a9dmxsa3yt67d8ywc6391w6yjmnmv736dsbg0afvw2-eorpuo3r0p6qlg4vfjxpdh27u 20.219.120.140:237
+docker node promote Worker1  ---- To promote worker1 as a manager node
+docker node demote Worker1   ----- To demote Worker1 and make him back as a worker
+
+
+Azure Container Registry-------
+create vm & install docker 
+docker run --name u1 -it nginx
+container registries in azure -- create new 
+Click on access keys --- Enable admin user --- Note down login server, username & one password
+Registry Name : YashACR630
+Login Server : yashacr630.azurecr.io
+Username : YashACR630
+Pass1: LO0i7ArKUWJqg0kh2FMtaEhx8Fl4QHBSkAC98NIs6v+ACRDfEaxP
+Pass2: YgGWcykcsPzwb4I1bReaMzz10n/WlSYb3kwzj5bpBa+ACRCijaYO
+docker login <login-server>
+docker login yashacr630.azurecr.io
+docker tag <local-image-name> <loginserver>/<remote-image-name>:1.0
+docker tag nginx yashacr630.azurecr.io/mynginx:9.0
+docker images
+docker push <server-name>/<image-name>:tag
+docker push yashacr630.azurecr.io/mynginx:9.0
+
+In New VM
+docker login yashacr630.azurecr.io
+YashACR630
+LO0i7ArKUWJqg0kh2FMtaEhx8Fl4QHBSkAC98NIs6v+ACRDfEaxP
+docker run -d -p 80:80 --name <container-name> <server-name>/<image-name>:tag
+docker run -d -p 80:80 --name con1 yashacr630.azurecr.io/mynginx:9.0
+https://20.219.127.139:80
+
+Docker Image to App Service---
+# Docker
+# Build and push an image to Azure Container Registry
+# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
+
+trigger:
+- master
+
+resources:
+- repo: self
+
+variables:
+  # Container registry service connection established during pipeline creation
+  dockerRegistryServiceConnection: 'e113f245-6b05-4c59-b981-74c30b5a2d8c'
+  imageRepository: 'yashwebappproj'
+  containerRegistry: 'yashacr630.azurecr.io'
+  dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
+  tag: '$(Build.BuildId)'
+
+  # Agent VM image name
+  vmImageName: 'ubuntu-latest'
+
+stages:
+- stage: Build
+  displayName: Build and push stage
+  jobs:
+  - job: Build
+    displayName: Build
+    pool:
+      vmImage: $(vmImageName)
+    steps:
+    - task: Docker@2
+      displayName: Build and push an image to container registry
+      inputs:
+        command: buildAndPush
+        repository: $(imageRepository)
+        dockerfile: $(dockerfilePath)
+        containerRegistry: $(dockerRegistryServiceConnection)
+        tags: |
+          $(tag)
+- stage: Deploy
+  displayName: Deploy to webapp
+  jobs:
+  - job: Deploy
+    displayName: Deploy
+    pool:
+      vmImage: $(vmImageName)
+    steps:
+    - task: AzureWebAppContainer@1
+      inputs:
+        azureSubscription: 'Pay-As-You-Go(7016ea2b-0906-42a2-b782-827cc8b4553a)'
+        appName: 'Yashpage'
+        containers: 'Yashimage'
+-------------------------------------------------------
+
+Kubernetes----
+
+K8S-RG
+Cluster name : K8s-cluster 
+Container Registry name : K8SCR
+az aks get-credentials -g <Resource-Group-name> -n <Kubernetes-cluster-name>
+az aks get-credentials -g K8S-RG -n K8s-cluster
+kubectl run <Pod-name> --image <Image-Name>
+kubectl run webserver --image nginx
+kubectl get pods -o wide  --- We can check ip address
+kubectl describe pod <pod-name>
+kubectl describe pod webserver 
+kubectl logs <pod-name>
+kubectl logs webserver
+kubectl delete pod <pod-name>
+kubectl delete pod webserver
+Take file1.yaml ---- for pod  -------   apiVersion: v1
+kind: Pod
+metadata:
+  name: webserver1
+  labels:
+    app: app1
+spec:
+  containers:
+    - name: web
+      image: nginx
+      ports:
+        - name: web
+          containerPort: 80
+          protocol: TCP
+
+Kubectl apply -f file1.yaml   ----- Creates the pod
+kubectl get pods -o wide
+
+Replica Controller------
+
+kubectl create -f file2.yaml
+apiVersion: v1
+kind: ReplicationController
+metadata:
+ name: httpd-rc
+ labels:
+  author: ankit
+spec:
+ replicas: 2
+ template:
+  metadata:
+   name: httpd-pod
+   labels:
+    author: ankit
+  spec:
+   containers:
+    - name: myhttpd
+      image: nginx
+      ports:
+       - containerPort: 80
+         name: http
+
+kubectl get pods
+kubectl delete pods httpd-rc-6l8m8 httpd-rc-9qt5r ---- Agai its Creates 
+kubectl delete --all pods 
+
+"Yaml Lint" ---- Tp Validate the yaml file 
+
+Replicaset-------
+
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+ name: webserver
+ labels:
+  type: webserver
+  author: ankit
+spec:
+ replicas: 2
+ selector:
+  matchLabels:
+   type: webserver
+ template:
+  metadata:
+   name: webserver
+   labels:
+    type: webserver
+  spec:
+   containers:
+    - name: nginx
+      image: nginx
+      ports:
+       - containerPort: 80
+         name: http
+kubectl create -f file3.yaml
+Change replica = 2
+kubectl replace -f file3.yaml
+kubectl get replicaset
+kubectl scale --replicas=2 -f file3.yaml
+
+Deployment Object -----
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginx
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.14.2
+        ports:
+        - containerPort: 80
+
+kubectl get deployments
+kubectl create -f file4.yaml
+kubectl get all
+kubectl get pods -o wide
+kubectl describe pods <pod-name>
+kubectl describe pods nginx-deployment-6595874d85-mgx8r
+Change to versionto 1.14.2. to 1.16.1
+kubectl replace -f file4.yaml
+kubectl rollout undo deployment/nginx-deployment   ---- It will update to previous version of pods
+kubectl set image deployment.v1.apps/nginxdeployment nginx=nginx:1.16.1  --- It will update the pods to previous to previous version
+
+Service Object -------
+
+Service-Object-Pod-File
+  
+apiVersion: v1
+kind: Pod
+metadata:
+ name: nginx-pod
+ labels:
+  author: ankit
+  type: reverse-proxy
+spec:
+ containers: 
+  - name: appserver
+    image: nginx
+
+Service-Object-Service-------
+
+apiVersion: v1
+kind: Service
+metadata:
+ name: nginx-service
+ labels:
+  author: ankit
+spec:
+ type: NodePort
+ ports:
+  - targetPort: 80
+    port: 80
+ type: LoadBalancer
+ selector:
+  author: ankit
+  type: reverse-proxy
+
+kubectl apply -f service-object-pod.yaml
+kubectl apply -f service-object-service.yaml
+kubectl get pods
+kubectl get svc
+kubectl get all
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+  
